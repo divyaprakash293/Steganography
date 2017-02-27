@@ -6,6 +6,7 @@
 package imagep;
 
 import java.awt.image.BufferedImage;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
@@ -17,8 +18,72 @@ import java.util.*;
  */
 
 
+
+
 public class Imagep {
 
+public char[] decrypt(String aa)
+    {
+    
+        int temp = 0;
+        String ptext;
+        String key;
+        int s[] = new int[128];
+        int k[] = new int[128];
+        Scanner in =new Scanner(System. in );
+        System.out.print("\nENTER PLAIN TEXT\t");
+        ptext = aa;
+        System.out.print("\n\nENTER KEY TEXT\t\t");
+        key = in.nextLine();
+        char ptextc[] = ptext.toCharArray();
+        char keyc[] = key.toCharArray();
+        int cipher[] = new int[ptext.length()];
+        int decrypt[] = new int[ptext.length()];
+        int ptexti[] = new int[ptext.length()];
+        int keyi[] = new int[key.length()];
+        for (int i=0; i<ptext.length(); i++)
+        {
+            ptexti[i] = (int) ptextc[i];
+        }
+        for (int i = 0; i<key.length(); i++)
+        {
+            keyi[i] = (int) keyc[i];
+        }
+        for (int i = 0; i < 127; i++) 
+        {
+            s[i] = i;
+            k[i] = keyi[i % key.length()];
+        }
+        int j = 0;
+        for (int i = 0; i < 127; i++)
+        {
+            j = (j + s[i] + k[i]) % 128;
+            temp = s[i];
+            s[i] = s[j];
+            s[j] = temp;
+        }
+        int i = 0;
+        j = 0;
+        int z = 0;
+        for (int l = 0; l < ptext.length(); l++)
+        {
+            i = (l + 1) % 128;
+            j = (j + s[i]) % 128;
+            temp = s[i];
+            s[i] = s[j];
+            s[j] = temp;
+            z = s[(s[i] + s[j]) % 128];
+            cipher[l] = z ^ ptexti[l];
+        }
+     
+        char arr[]=new char[cipher.length];
+        for(int y=0;y<cipher.length;y++)
+            arr[y]=(char)cipher[y];
+
+        return arr;
+
+    }
+     
     
      private byte[] decode_text(byte[] image)
 	{
@@ -49,6 +114,8 @@ public class Imagep {
     public static void main(String[] args) {
         
         Imagep p=new Imagep();
+        
+       
         Scanner s=new Scanner(System.in);
          BufferedImage sourceImage1 = null;
         try {
@@ -59,7 +126,7 @@ public class Imagep {
         } catch (IOException e) {
         }
         
-         int type1 = sourceImage1.getType();
+        int type1 = sourceImage1.getType();
         int w1 = sourceImage1.getWidth();
         int h1 = sourceImage1.getHeight();
         byte[] arr1 = null;
@@ -69,10 +136,20 @@ public class Imagep {
         }
         
         byte[] dec=p.decode_text(arr1);
-        String te=new String(dec);
-        System.out.println(te);
         
+        String as=new String(dec);
         
+        System.out.println(as);
+        
+        char[] b=p.decrypt(as);
+        
+        byte [] by=new byte[b.length];
+        for(int i=0;i<b.length;i++)
+            by[i]=(byte)b[i];
+        
+        String dry=new String(by);
+        System.out.println(dry);
+      
     }
     
 }
